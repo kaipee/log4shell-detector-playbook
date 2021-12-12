@@ -1,0 +1,50 @@
+---
+- name: 'Identify log4shell exploit attempts.'
+  hosts: 'all'
+  gather_facts: true
+  become: true
+  become_user: 'root'
+
+  tasks:
+
+  - name: 'Install git.'
+    ansible.builtin.package:
+      name: 'git'
+      state: 'present'
+
+  - name: 'Check for Python3.'
+    raw: test -e /usr/bin/python3
+    changed_when: false
+    failed_when: false
+    register: check_python
+
+  - name: 'Install Python3 on Debian systems.'
+    raw: apt -y update && apt install -y python3-minimal
+    when: (ansible_facts['os_family'] == 'Debian') and (check_python.rc != 0)
+
+  - name: 'Install Python3 on RedHat systems.'
+    raw: yum install -y python3
+    when: (ansible_facts['os_family'] == 'RedHat') and (check_python.rc != 0)
+
+  - name: 'Clone the log4shell-detector python script.'
+    ansible.builtin.git:
+      bare: false
+      clone: true
+      depth: 1
+      dest: '/tmp/log4shell'
+      force: false
+      recursive: true
+      remote: 'origin'
+      repo: 'https://github.com/Neo23x0/log4shell-detector.git'
+      track_submodules: true
+      update: true
+      version: 'main'
+
+  - name: 'Detect log4shell attempts in standard logs.'
+    raw: /usr/bin/python3 /tmp/log4shell/log4shell-detector.py --defaultpaths
+    register: 'found_logs'
+
+  - debug:
+      var: 'found_logs.stdout_lines'
+
+  - local_action: copy content={{ found_logs.stdout }} dest=reports/{{ inventory_hostname }}
