@@ -44,6 +44,11 @@
     raw: /usr/bin/python3 /tmp/log4shell/log4shell-detector.py --defaultpaths
     register: 'found_logs'
 
+  - name: 'Cleanup cloned repository.'
+    file:
+      state: absent
+      path: /tmp/log4shell/
+
   - debug:
       var: 'found_logs.stdout_lines'
 
