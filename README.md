@@ -30,6 +30,10 @@ ansible-playbook -i inventory main.yml
 
 Review the findings for each host under the **reports** directory.
 
+```sh
+grep -iTR 'attempt detected' reports/*
+```
+
 ## Credits
 
 All credit goes to [@cyberops](https://twitter.com/cyb3rops) for the log4shell-detector tool.
