@@ -5,6 +5,9 @@
   become: true
   become_user: 'root'
 
+  vars:
+    date: "{{ lookup('pipe', 'date +%Y%m%d-%H%M') }}"
+
   tasks:
 
   - name: 'Install git.'
@@ -52,4 +55,4 @@
   - debug:
       var: 'found_logs.stdout_lines'
 
-  - local_action: copy content={{ found_logs.stdout }} dest=reports/{{ inventory_hostname }}
+  - local_action: copy content={{ found_logs.stdout }} dest="reports/{{ inventory_hostname }}_{{ date }}"
