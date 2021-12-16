@@ -44,7 +44,7 @@
       version: 'main'
 
   - name: 'Detect log4shell attempts in standard logs.'
-    raw: /usr/bin/python3 /tmp/log4shell/log4shell-detector.py --defaultpaths
+    raw: /usr/bin/python3 /tmp/log4shell/log4shell-detector.py --defaultpaths --silent
     register: 'found_logs'
 
   - name: 'Cleanup cloned repository.'
